@@ -1,0 +1,21 @@
+#BEGINTEST
+void take_branch() {
+    int a = 1;
+    int b;
+
+    #INPUT ex1.c
+
+    #ASSERT b == 1
+}
+#ENDTEST
+
+#BEGINTEST
+void take_branch() {
+    int a = 0;
+    int b;
+
+    #INPUT ex1.c
+
+    #ASSERT b == 0
+}
+#ENDTEST

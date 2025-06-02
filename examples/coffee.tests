@@ -1,0 +1,28 @@
+#BEGINTEST
+void test_coffee_sufficient_energy() {
+  int coffee = 1;
+  int deadline = _;
+  int meeting = _;
+
+  int energy = 0;
+
+  #INPUT ifs.c
+
+  #ASSERT energy >= 0
+}
+#ENDTEST
+
+if < 3
+  #ASSERT asd
+i+= 1
+ }
+if i < 3
+  #ASSERT asd
+i+= 1
+ }
+if i < 3
+  #ASSERT asd
+i+= 1
+ }
+
+#ASSERT i >= 3

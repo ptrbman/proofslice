@@ -1,0 +1,36 @@
+#BEGINTEST
+void test() {
+	int a = 5;
+	int b = 3;
+	int c = 5;
+	int d = 3;
+	int e = 2;
+	int f = 2;
+	int g = 1;
+	int h = 5;
+	int i = 0;
+	int j = 2;
+	int k = 4;
+	int l = 0;
+	int m = 0;
+	int n = 0;
+	int o = 5;
+	int p = 3;
+	int q = 2;
+	int r = 3;
+	int s = 3;
+	int t = 1;
+	int u = 0;
+	int v = 0;
+	int w = 3;
+	int x = 2;
+	int y = 5;
+	int z = 3;
+	int x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_10, x_11, x_12, x_13, x_14, x_15, x_16, x_17, x_18, x_19, x_20, x_21, x_22, x_23, x_24;
+	int result;
+
+	#INPUT arith01.c
+
+	#ASSERT result == -600
+}
+#ENDTEST

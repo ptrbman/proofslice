@@ -1,0 +1,14 @@
+#BEGINTEST
+void test() {
+  int a = 0;
+  int b = 0;
+  int c = 0;
+  int d = 0;
+  int e;
+
+  #INPUT ex4.c
+
+  #ASSERT e == 0
+
+}
+#ENDTEST
