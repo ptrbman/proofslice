@@ -73,6 +73,26 @@ class Le(BinOp):
     def __str__(self):
         return str(self.lhs) + " <= " + str(self.rhs)
 
+class Div(BinOp):
+    def to_ssa(self, uses):
+        return Div(self.lhs.to_ssa(uses), self.rhs.to_ssa(uses))
+
+    def to_bmc(self):
+        return "(div " + self.lhs.to_bmc() + " " + self.rhs.to_bmc() + ")"
+
+    def __str__(self):
+        return str(self.lhs) + " / " + str(self.rhs)
+
+class Mod(BinOp):
+    def to_ssa(self, uses):
+        return Mod(self.lhs.to_ssa(uses), self.rhs.to_ssa(uses))
+
+    def to_bmc(self):
+        return "(mod " + self.lhs.to_bmc() + " " + self.rhs.to_bmc() + ")"
+
+    def __str__(self):
+        return str(self.lhs) + " % " + str(self.rhs)
+
 # Boolean
 
 class And(BinOp):

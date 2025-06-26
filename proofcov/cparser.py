@@ -6,9 +6,9 @@ from goto import *
 
 class SSA():
     def __init__(self, pointer=None):
-        self.uses = {}
+        self.uses = {} 
         self.suffix = ''
-        self.suffix_inc = False # This is set to True first time suffix is inc (before that we use without suffix)
+        self.suffix_used = {} # Contains all symbols which have increased the suffix
         self.pointer=pointer #We update the SSA pointed to by pointer
         self.extra_declares = [] # This is updated through pointer if copied SSA needs to propagate declares
 
@@ -22,7 +22,7 @@ class SSA():
 
     def use(self, name):
         assert(name in self.uses)
-        if self.suffix_inc:
+        if name in self.suffix_used:
             return name + '.' + self.suffix + '.' + str(self.uses[name])
         else:
             return name + '.' + str(self.uses[name])
@@ -36,7 +36,7 @@ class SSA():
             self.pointer.inc(name)
 
         if not self.suffix == '':
-            self.suffix_inc = True
+            self.suffix_used[name] = True
         return self.use(name)
 
     # Creates a copy
@@ -57,9 +57,8 @@ class SSA():
 
     
 class CParser():
-    def parse_test(test):
-        c_code = test.code
-        print(Panel.fit(c_code, title="C code"))
+    def parse_lines(lines):
+        c_code = ''.join(lines)
         # Create a parser object
         parser = c_parser.CParser()
 
@@ -109,6 +108,12 @@ class CParser():
             # TODO: If a value is only changed in one branch, it must be PHI/ed with its original value
             if iff and ift:
                 lines.append(Phi(ssa.inc(v), cond, ift, iff, src_line))
+            elif iff:
+                prev = ssa.use(v)
+                lines.append(Phi(ssa.inc(v), cond, prev, iff, src_line))
+            elif ift:
+                prev = ssa.use(v)
+                lines.append(Phi(ssa.inc(v), cond, ift, prev, src_line))
 
         return lines
 
@@ -135,7 +140,10 @@ class CParser():
                 return And(lhs, rhs)
             elif e.op == '||':
                 return Or(lhs, rhs)
-
+            elif e.op == '%':
+                return Mod(lhs, rhs)
+            elif e.op == '/':
+                return Div(lhs, rhs)
             else:
                raise TypeError(f"Unsupported binop: {e.op}")
         elif isinstance(e, c_ast.ID):
@@ -183,6 +191,7 @@ class CParser():
 
     # Returns list of stmts due to compound
     def handle_stmt(s, ssa):
+        print("STMT:", s)
         if isinstance(s, c_ast.FuncCall):
             return [CParser.handle_call(s, ssa)]
         elif isinstance(s, c_ast.Return):
@@ -228,6 +237,8 @@ class CParser():
             lhs = Var(ssa.inc(s.lvalue.name))
 
             return [Assignment(lhs, rhs, s.coord.line)]
+        elif isinstance(s, c_ast.For):
+            raise NotImplementedError("For loops are not supported yet, please unroll them manually")
         else:
             raise TypeError(f"Unsupported statement: {s}")
 

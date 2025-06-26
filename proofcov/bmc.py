@@ -4,6 +4,9 @@ import subprocess
 import re
 
 class BMC():
+
+    subexpr_count = {}
+
     def make_assert(line):
         return ["(assert (! " + b + " :named line" + str(line.src_line) + "." + str(i) + ")) ; line " + str(line.src_line) for i, b in enumerate(line.to_bmc())]
 
@@ -16,6 +19,11 @@ class BMC():
             rhs_node, rhs_constraints, rhs_created, annotated_rhs = BMC.create_subexprs(l.rhs, line, count + lhs_created)
             # print("Binop:", l)
             node_name = "subexpr_" + str(line) + "_" + str(count + lhs_created + rhs_created)
+            if node_name in BMC.subexpr_count:
+                BMC.subexpr_count[node_name] += 1
+                node_name = node_name + "x" + str(BMC.subexpr_count[node_name])
+            else:
+                BMC.subexpr_count[node_name] = 0
             l.lhs = lhs_node
             l.rhs = rhs_node
             #TODO: only Bool types
@@ -58,11 +66,12 @@ class BMC():
        # TODO: we assume one expr per line ...
        count = 0
        node, constraints, count, annotated = BMC.create_subexprs(l.cond, l.src_line)
-       # print(node)
-       # for c in constraints:
-           # print(c)
+    #    print("Handling phi:", l, "=>", node, constraints)
+    #    print(node)
+    #    for c in constraints:
+        #    print(c)
        l.cond = node
-       # BMC.print_node(annotated)
+    #    BMC.print_node(annotated)
        return constraints + ["(assert " + l.to_bmc()[0] +")", "(assert " + l.to_bmc()[1] +")"], (annotated, l.src_line)
 
     def gen_formula(goto, ssa):
@@ -174,7 +183,7 @@ class BMC():
 
     def get_core(formula):
         stdout = BMC.run_z3("(set-option :produce-unsat-cores true)\n(set-option :smt.core.minimize true)\n" + formula + "\n(get-unsat-core)")
-
+        print(stdout)
         p = r"line(\d+)\.(\d+)"
         r = re.findall(p, stdout)
         lines = set()
@@ -184,5 +193,6 @@ class BMC():
         p = r"name_subexpr_(\d+)_(\d+)"
         r = re.findall(p, stdout)
         for m in r:
-            lines.add((int(m[0]), int(m[1])))
+            lines.add(int(m[0])) # We throwaway the second number, as we only care about the line number
+            # lines.add((int(m[0]), int(m[1])))
         return lines
