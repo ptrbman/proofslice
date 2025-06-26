@@ -14,11 +14,5 @@ void main() {
         final_balance = balance - transaction - fee;
     }
 
-    if (balance > transaction) {
-        approved = approved;
-    } else {
-        final_balance = final_balance;
-    }
-
     assert(final_balance == 48);  
 }

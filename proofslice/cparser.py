@@ -191,7 +191,6 @@ class CParser():
 
     # Returns list of stmts due to compound
     def handle_stmt(s, ssa):
-        print("STMT:", s)
         if isinstance(s, c_ast.FuncCall):
             return [CParser.handle_call(s, ssa)]
         elif isinstance(s, c_ast.Return):

@@ -17,7 +17,6 @@ def unroll(lines, n):
     found_loops = 0 # We need to know how many loops we found to adjust the line map correctly
     i = 0
     while i < len(lines):
-        print(f"{i} ... {len(unrolled_lines)}: {lines[i].strip()}")
         # Match a simple for loop (e.g., for (int i = 1; i <= 10; i++))
         line = lines[i]
         match = re.match(r'\s*for\s*\(\s*(int\s+)?(\w+)\s*=\s*(\d+)\s*;\s*\2\s*(<|<=)\s*(\d+)\s*;\s*\2\+\+\s*\)\s*{', line)
@@ -50,7 +49,6 @@ def unroll(lines, n):
             for x in range(start, min(start + n, end)):
                 for x2, body_line in enumerate(loop_body):
                     line_map[len(unrolled_lines)] = i + x2 + 1
-                    print(f"Added to line map: {len(unrolled_lines)} -> {i + x2 + 1}")
                     unrolled_lines.append(body_line.replace(var_name, str(x)))
                     # Update line map
             i = i + loop_lines
@@ -58,7 +56,6 @@ def unroll(lines, n):
             skip_closing_brace = False  # Skip this closing brace
         else:
             line_map[len(unrolled_lines)] = i #  Map the original line number
-            print(f"Added to line map2: {len(unrolled_lines)} -> {i }")
             unrolled_lines.append(line)
         i += 1
     

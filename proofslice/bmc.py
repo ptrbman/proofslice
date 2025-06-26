@@ -183,7 +183,6 @@ class BMC():
 
     def get_core(formula):
         stdout = BMC.run_z3("(set-option :produce-unsat-cores true)\n(set-option :smt.core.minimize true)\n" + formula + "\n(get-unsat-core)")
-        print(stdout)
         p = r"line(\d+)\.(\d+)"
         r = re.findall(p, stdout)
         lines = set()

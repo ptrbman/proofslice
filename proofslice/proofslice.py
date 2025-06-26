@@ -48,19 +48,17 @@ print(Panel.fit(''.join(lines), title="C code after unrolling loops"))
 
 UNROLLINGS = 10
 unrolled_lines, line_map = unroll(lines, UNROLLINGS)
-print("UNROLLINGS:", UNROLLINGS)
-for idx, ur in enumerate(unrolled_lines):
-    print(f"{idx}/{line_map[idx]}: {ur.strip()}")
-# print(Panel.fit(''.join(unrolled_lines), title="C code after unrolling loops"))
 
 # 2. Convert file to goto code
 ast = CParser.parse_lines(unrolled_lines)
 goto, ssa = CParser.ast_to_goto(ast)
+print(Panel.fit("[green]Goto code:[/green]"))
 print(goto)
 
 # 3. Convert goto code to BMC formula
 formula, annotated_nodes = BMC.gen_formula(goto, ssa)
-print(formula, annotated_nodes)
+print(Panel.fit("[purple]SMT formula:[/purple]"))
+print(formula)
 
 # 4. Run BMC on the formula
 sat = BMC.check_sat(formula)
@@ -71,24 +69,26 @@ if (sat):
 
 # 5. If BMC returns a core, extract the lines and subexpressions
 result = BMC.get_core(formula)
-print(f"Unsat core: {result}")
+print(Panel.fit("[blue]Unsat core:[/blue]"))
+print(f"{result}")
 
-# 6. Find each line which is used by the core and mark it
+# 6. Find each line which is used by the core and translate back to original and mark it
 marked_lines = list(result)
 marked_lines.sort()
 
-print("Marked lines:", marked_lines)
-print("Line map:", line_map)
+# print("Marked lines:", marked_lines)
+# print("Line map:", line_map)
 
 original_marked_lines = set()
 
 for ml in marked_lines:
     original_marked_lines.add(line_map[ml-1] + 1)
-    print(f"Marked line {ml} corresponds to original line {line_map[ml-1] + 1}")
+    # print(f"Marked line {ml} corresponds to original line {line_map[ml-1] + 1}")
 
 
-print(f"original_marked_lines: {original_marked_lines}")
-
+# print(f"original_marked_lines: {original_marked_lines}")
+print(Panel.fit("[red]Marked lines:[/red]"))
+print(f"{original_marked_lines}")
 
 
 for i in range(len(lines)):
@@ -102,11 +102,14 @@ for i in range(len(lines)):
         ()
     elif 'int' in lines[i]:
         ()
+    elif lines[i].strip() == '':
+        ()
     elif 'if' in lines[i]:
         # If unmarked, replace it by true to ensure first branch is taken
         lines[i] = 'if (1 == 0) {\n'
     else:
         lines[i] = "// " + lines[i]  # Comment out unmarked lines
+
 
 output_code = ''.join(lines)
 console = Console()
