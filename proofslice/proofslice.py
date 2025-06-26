@@ -36,6 +36,8 @@ if len(sys.argv) != 2:
 # 1. Take a C file and parse it (currently we do nothing, but could have preprocessing here)
 file_path = sys.argv[1]
 dirpath, filename = split_path(file_path)
+if not dirpath:
+    dirpath = '.'
 print("Opening file", dirpath + "/" + filename)
 
 if not os.path.exists(dirpath + '/' + filename):
