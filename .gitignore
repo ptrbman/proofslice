@@ -1,3 +1,4 @@
 pyenv
 tmp.smt2
-proofcov/__pycache__
+proofslice/__pycache__
+tmp.c
