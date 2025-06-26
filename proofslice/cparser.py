@@ -39,6 +39,14 @@ class SSA():
             self.suffix_used[name] = True
         return self.use(name)
 
+    def copy(self):
+        new_ssa = SSA(self)
+        new_ssa.uses = self.uses.copy()
+        new_ssa.suffix = self.suffix
+        new_ssa.suffix_used = self.suffix_used.copy()
+        new_ssa.extra_declares = self.extra_declares.copy()
+        return new_ssa
+
     # Creates a copy
     def activate_suffix(self, suffix):
         new_ssa = SSA(self)
@@ -74,7 +82,7 @@ class CParser():
         return l
 
 
-    def handle_if(src_line, cond, iftrue, iffalse, ssa, ssa_false, ssa_true):
+    def handle_if(src_line, cond, iftrue, iffalse, ssa, ssa_before):
         btrue = CParser.gen_label("iftrue")
         bafter = CParser.gen_label("ifafter")
         lines = []
@@ -109,10 +117,10 @@ class CParser():
             if iff and ift:
                 lines.append(Phi(ssa.inc(v), cond, ift, iff, src_line))
             elif iff:
-                prev = ssa.use(v)
+                prev = ssa_before.use(v)
                 lines.append(Phi(ssa.inc(v), cond, prev, iff, src_line))
             elif ift:
-                prev = ssa.use(v)
+                prev = ssa_before.use(v)
                 lines.append(Phi(ssa.inc(v), cond, ift, prev, src_line))
 
         return lines
@@ -197,11 +205,12 @@ class CParser():
             return [Return(CParser.handle_expr(s.expr, ssa))]
         elif isinstance(s, c_ast.If):
             cond = CParser.handle_expr(s.cond, ssa, True)
+            ssa_before = ssa.copy() 
             ssa_false = ssa.activate_suffix('F')
             ssa_true = ssa.activate_suffix('T')
             iffalse = CParser.handle_stmt(s.iffalse, ssa_false)
             iftrue = CParser.handle_stmt(s.iftrue, ssa_true)
-            return CParser.handle_if(s.coord.line, cond, iftrue, iffalse, ssa, ssa_false, ssa_true)
+            return CParser.handle_if(s.coord.line, cond, iftrue, iffalse, ssa, ssa_before)
         elif isinstance(s, c_ast.Compound):
             if not s.block_items:
                 return []

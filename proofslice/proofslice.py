@@ -108,7 +108,9 @@ for i in range(len(lines)):
         ()
     elif 'if' in lines[i]:
         # If unmarked, replace it by true to ensure first branch is taken
-        lines[i] = 'if (1 == 0) {\n'
+        # Uncomment this to force first branch to be taken (if marked it means it doesn't matter)
+        # lines[i] = 'if (1 == 0) {\n'
+        ()
     else:
         lines[i] = "// " + lines[i]  # Comment out unmarked lines
 

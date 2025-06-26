@@ -11,6 +11,7 @@ class BMC():
         return ["(assert (! " + b + " :named line" + str(line.src_line) + "." + str(i) + ")) ; line " + str(line.src_line) for i, b in enumerate(line.to_bmc())]
 
 
+    # This is used to track the usage of subexpressions in if-statements (e.g., in if (a && b) we can slice away only a or b).
     # Returns name, constraints, number of created exprs, annotated AST - name of top-level subexpr and constraints required
     def create_subexprs(l, line, count=0):
         # print("-->create(" + str(l) + ")")
@@ -65,14 +66,15 @@ class BMC():
     def handle_phi(l):
        # TODO: we assume one expr per line ...
        count = 0
-       node, constraints, count, annotated = BMC.create_subexprs(l.cond, l.src_line)
+    #    node, constraints, count, annotated = BMC.create_subexprs(l.cond, l.src_line)
     #    print("Handling phi:", l, "=>", node, constraints)
     #    print(node)
     #    for c in constraints:
         #    print(c)
-       l.cond = node
+    #    l.cond = node
     #    BMC.print_node(annotated)
-       return constraints + ["(assert " + l.to_bmc()[0] +")", "(assert " + l.to_bmc()[1] +")"], (annotated, l.src_line)
+    #    return constraints + ["(assert " + l.to_bmc()[0] +")", "(assert " + l.to_bmc()[1] +")"], (annotated, l.src_line)
+       return ["(assert " + l.to_bmc()[0] +")", "(assert " + l.to_bmc()[1] +")"], ([], l.src_line)
 
     def gen_formula(goto, ssa):
         assert(isinstance(goto, Function))
